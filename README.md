@@ -1,16 +1,24 @@
 # AgentBuild
 
-A multi-tool AI agent chatbot built with LangChain.js, LangGraph, and Claude. Features a minimalist streaming chat interface.
+A multi-tool AI agent chatbot built with LangChain.js, LangGraph, and Claude. Features a minimalist streaming chat interface with four tools and conversation memory.
 
 ## Tools
 
 - **Calculator** — evaluates mathematical expressions via mathjs
 - **Web Search** — searches the web using the Tavily API
-- **RAG** — semantic search over a documentation knowledge base *(Phase 2)*
+- **RAG** — semantic search over a local knowledge base with source attribution (documents persist across restarts)
+- **Wikipedia** — fetches summaries directly from Wikipedia
+
+## Features
+
+- Streaming responses — tokens render live as the agent thinks
+- Conversation memory — follow-up questions work across turns
+- Tool badges — the UI shows which tools were used for each response
+- Structured logging — every tool call logs its name, arguments, result, and duration
 
 ## Tech Stack
 
-TypeScript · Next.js 15 App Router · LangGraph · Claude (Anthropic) · Tavily · Vitest
+TypeScript · Next.js 15 App Router · LangGraph · Claude Sonnet 4.6 (Anthropic) · Tavily · Vitest
 
 ## Setup
 
@@ -19,13 +27,15 @@ TypeScript · Next.js 15 App Router · LangGraph · Claude (Anthropic) · Tavily
    npm install
    ```
 
-2. Copy `.env.example` to `.env.local` and add your API keys:
-   ```bash
-   cp .env.example .env.local
+2. Create `.env.local` and add your API keys:
    ```
-   Required keys:
+   ANTHROPIC_API_KEY=...
+   TAVILY_API_KEY=...
+   OPENAI_API_KEY=...
+   ```
    - `ANTHROPIC_API_KEY` — [console.anthropic.com](https://console.anthropic.com)
    - `TAVILY_API_KEY` — [tavily.com](https://tavily.com)
+   - `OPENAI_API_KEY` — used for RAG embeddings
 
 3. Run the dev server:
    ```bash
