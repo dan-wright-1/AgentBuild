@@ -13,6 +13,9 @@ build/
 .env.local
 .env.*.local
 
+# rag vector cache
+lib/rag/vectorStore.cache.json
+
 # misc
 .DS_Store
 *.pem

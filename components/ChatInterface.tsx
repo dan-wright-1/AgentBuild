@@ -13,6 +13,7 @@ const TOOL_LABELS: Record<string, string> = {
   calculator: "calculator",
   web_search: "web search",
   rag_search: "knowledge base",
+  wikipedia: "wikipedia",
 };
 
 export default function ChatInterface() {

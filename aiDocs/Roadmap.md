@@ -79,6 +79,6 @@
 ---
 
 ## Stretch Goals (Extra Credit)
-- [ ] 4th custom tool
-- [ ] Persistent vector store (survives restarts)
-- [ ] Agent proposal write-up
+- [x] 4th custom tool — Wikipedia lookup (free API, no key required)
+- [x] Persistent vector store — embeddings cached to `vectorStore.cache.json`, survives restarts
+- [x] Agent proposal write-up — `aiDocs/agent-proposal.md`
