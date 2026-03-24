@@ -3,78 +3,78 @@
 ## Phase 1 — Foundation (Unit 7)
 
 ### Project Setup
-- [ ] Initialize Next.js App Router project (TypeScript)
-- [ ] Configure `.env.local` and `.env.example`
-- [ ] Set up `.gitignore` (no secrets, no node_modules)
-- [ ] Initialize git repo with first commit
+- [x] Initialize Next.js App Router project (TypeScript)
+- [x] Configure `.env.local` and `.env.example`
+- [x] Set up `.gitignore` (no secrets, no node_modules)
+- [x] Initialize git repo with first commit
 
 ### Core Dependencies
-- [ ] Install `langchain`, `@langchain/core`, `@langchain/langgraph`
-- [ ] Install `@langchain/anthropic`
-- [ ] Install `@langchain/tavily`
-- [ ] Install `zod`
-- [ ] Install `mathjs` (safe math evaluation)
+- [x] Install `langchain`, `@langchain/core`, `@langchain/langgraph`
+- [x] Install `@langchain/anthropic`
+- [x] Install `@langchain/tavily`
+- [x] Install `zod`
+- [x] Install `mathjs` (safe math evaluation)
 
 ### Calculator Tool
-- [ ] Implement math expression evaluator using `mathjs`
-- [ ] Wrap as a LangChain tool with Zod schema
-- [ ] Add structured logging (tool name, args, result)
-- [ ] Unit test the tool in isolation
+- [x] Implement math expression evaluator using `mathjs`
+- [x] Wrap as a LangChain tool with Zod schema
+- [x] Add structured logging (tool name, args, result)
+- [x] Unit test the tool in isolation
 
 ### Web Search Tool
-- [ ] Implement TavilySearch tool wrapper
-- [ ] Add structured logging
-- [ ] Unit test the tool in isolation
+- [x] Implement TavilySearch tool wrapper
+- [x] Add structured logging
+- [x] Unit test the tool in isolation
 
 ### Agent Core
-- [ ] Create LangGraph `createReactAgent` with tool binding
-- [ ] Add structured logging middleware for all tool calls
-- [ ] Test agent routes correctly (math → calculator, web query → Tavily)
+- [x] Create LangGraph `createReactAgent` with tool binding
+- [x] Add structured logging middleware for all tool calls
+- [x] Test agent routes correctly (math → calculator, web query → Tavily)
 
 ### Next.js API Route
-- [ ] Create `app/api/chat/route.ts` — POST handler
-- [ ] Wire agent invocation to API route
-- [ ] Test with curl
+- [x] Create `app/api/chat/route.ts` — POST handler
+- [x] Wire agent invocation to API route
+- [x] Test with curl
 
 ### Web UI (React)
-- [ ] Build chat interface component (dark, minimalist)
-- [ ] Show tool use badge per response (which tool was called)
-- [ ] Display conversation history in session
+- [x] Build chat interface component (dark, minimalist)
+- [x] Show tool use badge per response (which tool was called)
+- [x] Display conversation history in session
 
 ### Repo Hygiene (Rubric)
-- [ ] README.md with setup + run instructions
-- [ ] 5+ meaningful incremental commits
-- [ ] Structured logging verified in console output
+- [x] README.md with setup + run instructions
+- [ ] 5+ meaningful incremental commits (in progress)
+- [x] Structured logging verified in console output
 
 ---
 
 ## Phase 2 — Enhancement (Unit 8)
 
 ### Streaming Responses
-- [ ] Switch API route to SSE using `ReadableStream` / `TransformStream`
-- [ ] Pipe LangGraph `.stream()` output through SSE as `data: {"token": "..."}`
-- [ ] Frontend reads stream via `fetch` + `ReadableStream`, appends tokens live
-- [ ] Signal stream end with `data: [DONE]`
-- [ ] Test: tokens appear in real-time in UI
+- [x] Switch API route to SSE using `ReadableStream` / `TransformStream`
+- [x] Pipe LangGraph `.streamEvents()` output through SSE as `data: {"token": "..."}`
+- [x] Frontend reads stream via `fetch` + `ReadableStream`, appends tokens live
+- [x] Signal stream end with `data: [DONE]`
+- [x] Test: tokens appear in real-time in UI
 
 ### RAG Tool
-- [ ] Pull 5+ real LangChain/LangGraph docs via Context7 MCP
-- [ ] Generate embeddings → MemoryVectorStore
-- [ ] Wrap retriever as a LangChain tool with Zod schema
-- [ ] Include source attribution in every RAG response
-- [ ] Add structured logging for RAG queries
-- [ ] Unit test RAG tool in isolation
+- [x] Pull 5+ real LangChain/LangGraph docs via WebFetch (Context7 unavailable)
+- [x] Generate embeddings → MemoryVectorStore (`@langchain/openai` text-embedding-3-small)
+- [x] Wrap retriever as a LangChain tool with Zod schema
+- [x] Include source attribution in every RAG response
+- [x] Add structured logging for RAG queries
+- [x] Unit test RAG tool in isolation
 
 ### Conversation Memory
-- [ ] Integrate LangGraph message history into agent state
-- [ ] In-session multi-turn context (resets on page reload)
-- [ ] Test follow-up questions work correctly
+- [x] Integrate LangGraph message history into agent state
+- [x] In-session multi-turn context (resets on page reload)
+- [x] Test follow-up questions work correctly
 
 ### Polish & QA
-- [ ] Error handling for failed tool calls
-- [ ] Loading indicator in UI
-- [ ] Final end-to-end test: all 3 tools + memory
-- [ ] Clean up code, finalize README
+- [x] Error handling for failed tool calls
+- [x] Loading indicator in UI (streaming cursor)
+- [x] Final end-to-end test: all 3 tools + memory
+- [x] Clean up code, finalize README
 
 ---
 
