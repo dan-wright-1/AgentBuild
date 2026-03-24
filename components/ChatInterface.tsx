@@ -216,7 +216,11 @@ export default function ChatInterface() {
       </div>
 
       {/* Input */}
-      <div className="flex-none px-6 py-4" style={{ borderTop: "1px solid #ffffff" }}>
+      <div
+        className="flex-none px-6 py-4 cursor-text"
+        style={{ borderTop: "1px solid #ffffff" }}
+        onClick={() => inputRef.current?.focus()}
+      >
         <div className="flex items-end gap-3">
           <textarea
             ref={inputRef}
