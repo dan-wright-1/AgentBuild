@@ -11,8 +11,8 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #080808;
-  color: #e5e5e5;
+  background-color: #000000;
+  color: #ffffff;
 }
 
 ::-webkit-scrollbar {

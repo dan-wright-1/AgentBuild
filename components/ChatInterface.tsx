@@ -157,10 +157,10 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#080808] text-neutral-200 font-mono">
+    <div className="flex flex-col h-screen font-mono" style={{ backgroundColor: "#000000", color: "#ffffff" }}>
       {/* Header */}
-      <div className="flex-none px-6 py-4 border-b border-neutral-900">
-        <span className="text-xs tracking-[0.2em] text-neutral-500 uppercase">
+      <div className="flex-none px-6 py-4" style={{ borderBottom: "1px solid #333333" }}>
+        <span className="text-xs tracking-[0.2em] uppercase" style={{ color: "#ffffff" }}>
           agentbuild
         </span>
       </div>
@@ -169,7 +169,7 @@ export default function ChatInterface() {
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-neutral-700 text-sm tracking-widest">
+            <p className="text-sm tracking-widest" style={{ color: "#ffffff" }}>
               — ask anything —
             </p>
           </div>
@@ -190,7 +190,8 @@ export default function ChatInterface() {
                   {[...new Set(msg.tools)].map((t) => (
                     <span
                       key={t}
-                      className="text-[10px] tracking-widest text-neutral-600 border border-neutral-800 px-2 py-0.5 uppercase"
+                      className="text-[10px] tracking-widest px-2 py-0.5 uppercase"
+                      style={{ color: "#ffffff", border: "1px solid #ffffff" }}
                     >
                       {TOOL_LABELS[t] ?? t}
                     </span>
@@ -200,15 +201,12 @@ export default function ChatInterface() {
 
             {/* Message content */}
             <div
-              className={`text-sm leading-relaxed whitespace-pre-wrap ${
-                msg.role === "user"
-                  ? "text-neutral-400"
-                  : "text-neutral-100"
-              }`}
+              className="text-sm leading-relaxed whitespace-pre-wrap"
+              style={{ color: msg.role === "user" ? "#ffffff" : "#ffffff" }}
             >
               {msg.content}
               {msg.isStreaming && (
-                <span className="inline-block w-1.5 h-3.5 bg-neutral-500 ml-0.5 animate-pulse align-middle" />
+                <span className="inline-block w-1.5 h-3.5 ml-0.5 animate-pulse align-middle" style={{ backgroundColor: "#ffffff" }} />
               )}
             </div>
           </div>
@@ -217,7 +215,7 @@ export default function ChatInterface() {
       </div>
 
       {/* Input */}
-      <div className="flex-none border-t border-neutral-900 px-6 py-4">
+      <div className="flex-none px-6 py-4" style={{ borderTop: "1px solid #ffffff" }}>
         <div className="flex items-end gap-3">
           <textarea
             ref={inputRef}
@@ -227,8 +225,13 @@ export default function ChatInterface() {
             disabled={loading}
             placeholder=""
             rows={1}
-            className="flex-1 bg-transparent text-sm text-neutral-200 placeholder-neutral-700 resize-none outline-none border-b border-neutral-800 pb-1 focus:border-neutral-600 transition-colors duration-200 disabled:opacity-40"
-            style={{ minHeight: "1.5rem", maxHeight: "8rem" }}
+            className="flex-1 bg-transparent text-sm resize-none outline-none pb-1 transition-colors duration-200 disabled:opacity-40"
+            style={{
+              color: "#ffffff",
+              borderBottom: "1px solid #ffffff",
+              minHeight: "1.5rem",
+              maxHeight: "8rem",
+            }}
             onInput={(e) => {
               const el = e.currentTarget;
               el.style.height = "auto";
@@ -238,7 +241,8 @@ export default function ChatInterface() {
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
-            className="text-neutral-500 hover:text-neutral-200 transition-colors duration-200 disabled:opacity-20 pb-1 text-base"
+            className="pb-1 text-base transition-colors duration-200 disabled:opacity-20"
+            style={{ color: "#ffffff" }}
           >
             →
           </button>
