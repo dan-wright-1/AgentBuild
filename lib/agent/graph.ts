@@ -7,7 +7,6 @@ import { wikipediaTool } from "@/lib/tools/wikipediaTool";
 
 const model = new ChatAnthropic({
   model: "claude-sonnet-4-6",
-  temperature: 0,
 });
 
 export const agent = createReactAgent({

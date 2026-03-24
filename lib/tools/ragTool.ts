@@ -18,7 +18,7 @@ export const ragTool = tool(
       }
 
       const formatted = results
-        .map((doc) => `${doc.pageContent}\n\nsource: ${doc.metadata.source as string}`)
+        .map((doc: { pageContent: string; metadata: Record<string, unknown> }) => `${doc.pageContent}\n\nsource: ${doc.metadata.source as string}`)
         .join("\n\n---\n\n");
 
       log({ tool: "rag_search", args: { query }, result: formatted, duration: Date.now() - start });

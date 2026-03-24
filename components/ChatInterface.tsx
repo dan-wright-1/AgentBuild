@@ -170,7 +170,7 @@ export default function ChatInterface() {
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm tracking-widest" style={{ color: "#ffffff" }}>
+            <p className="text-sm tracking-widest select-none" style={{ color: "#ffffff", cursor: "default" }}>
               — ask anything —
             </p>
           </div>
