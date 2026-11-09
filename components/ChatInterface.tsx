@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import posthog from "posthog-js";
 
 interface Message {
   role: "user" | "assistant";
@@ -22,6 +23,7 @@ export default function ChatInterface() {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const conversationId = useRef(crypto.randomUUID());
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,6 +35,12 @@ export default function ChatInterface() {
 
     setInput("");
     setLoading(true);
+
+    const conversationTurn = messages.filter((message) => message.role === "user").length + 1;
+    posthog.capture("chat_message_submitted", {
+      conversation_turn: conversationTurn,
+      prompt_length: text.length,
+    });
 
     const history = messages.map((m) => ({ role: m.role, content: m.content }));
     const userMessage: Message = { role: "user", content: text };
@@ -51,13 +59,20 @@ export default function ChatInterface() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history }),
+        body: JSON.stringify({
+          message: text,
+          history,
+          sessionId: conversationId.current,
+        }),
       });
 
       if (!response.body) throw new Error("No response body");
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      const toolsUsed: string[] = [];
+      let responseCompleted = false;
+      let responseFailed = false;
       let buffer = "";
 
       while (true) {
@@ -96,6 +111,7 @@ export default function ChatInterface() {
             }
 
             if (event.type === "tool_start" && event.tool) {
+              toolsUsed.push(event.tool);
               setMessages((prev) => {
                 const updated = [...prev];
                 const last = updated[updated.length - 1];
@@ -106,6 +122,23 @@ export default function ChatInterface() {
                   };
                 }
                 return updated;
+              });
+            }
+
+            if (event.type === "done") {
+              responseCompleted = true;
+              posthog.capture("chat_response_completed", {
+                conversation_turn: conversationTurn,
+                tool_count: toolsUsed.length,
+                tools_used: [...new Set(toolsUsed)],
+              });
+            }
+
+            if (event.type === "error") {
+              responseFailed = true;
+              posthog.capture("chat_response_failed", {
+                conversation_turn: conversationTurn,
+                failure_stage: "stream",
               });
             }
 
@@ -131,7 +164,18 @@ export default function ChatInterface() {
           }
         }
       }
+
+      if (!responseCompleted && !responseFailed) {
+        posthog.capture("chat_response_failed", {
+          conversation_turn: conversationTurn,
+          failure_stage: "stream",
+        });
+      }
     } catch (error) {
+      posthog.capture("chat_response_failed", {
+        conversation_turn: conversationTurn,
+        failure_stage: "request",
+      });
       setMessages((prev) => {
         const updated = [...prev];
         const last = updated[updated.length - 1];
