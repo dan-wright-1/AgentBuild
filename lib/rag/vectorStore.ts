@@ -3,6 +3,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { Document } from "@langchain/core/documents";
 import fs from "fs";
 import path from "path";
+import { captureAIEmbedding, type AITraceContext } from "@/lib/posthog-server";
 
 const CACHE_PATH = path.join(process.cwd(), "lib", "rag", "vectorStore.cache.json");
 
@@ -29,7 +30,9 @@ function chunkText(text: string, chunkSize = 800, overlap = 100): string[] {
   return chunks.filter((c) => c.trim().length > 50);
 }
 
-export async function getVectorStore(): Promise<MemoryVectorStore> {
+export async function getVectorStore(
+  traceContext?: AITraceContext
+): Promise<MemoryVectorStore> {
   if (vectorStore) return vectorStore;
 
   const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
@@ -64,7 +67,19 @@ export async function getVectorStore(): Promise<MemoryVectorStore> {
     }
   }
 
+  const embeddingStart = Date.now();
   vectorStore = await MemoryVectorStore.fromDocuments(documents, embeddings);
+  if (traceContext) {
+    const inputs = documents.map((document) => document.pageContent);
+    captureAIEmbedding({
+      ...traceContext,
+      input: inputs,
+      inputTokens: Math.ceil(
+        inputs.reduce((length, input) => length + input.length, 0) / 4
+      ),
+      latency: (Date.now() - embeddingStart) / 1000,
+    });
+  }
 
   // Persist to cache
   const mv = (vectorStore as unknown as { memoryVectors: MemoryVector[] }).memoryVectors;

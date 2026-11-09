@@ -1,15 +1,35 @@
+import type { RunnableConfig } from "@langchain/core/runnables";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { getVectorStore } from "@/lib/rag/vectorStore";
 import { log } from "@/lib/logger";
+import { captureAIEmbedding, type AITraceContext } from "@/lib/posthog-server";
 
 export const ragTool = tool(
-  async ({ query }: { query: string }) => {
+  async ({ query }: { query: string }, config: RunnableConfig) => {
     const start = Date.now();
+    const metadata = config.metadata;
+    const traceContext: AITraceContext | undefined =
+      typeof metadata?.posthogSessionId === "string" &&
+      typeof metadata?.posthogTraceId === "string"
+        ? {
+            sessionId: metadata.posthogSessionId,
+            traceId: metadata.posthogTraceId,
+          }
+        : undefined;
 
     try {
-      const store = await getVectorStore();
+      const store = await getVectorStore(traceContext);
+      const embeddingStart = Date.now();
       const results = await store.similaritySearch(query, 3);
+      if (traceContext) {
+        captureAIEmbedding({
+          ...traceContext,
+          input: query,
+          inputTokens: Math.ceil(query.length / 4),
+          latency: (Date.now() - embeddingStart) / 1000,
+        });
+      }
 
       if (results.length === 0) {
         const result = "No relevant documentation found.";
