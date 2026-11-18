@@ -66,6 +66,14 @@ export default function ChatInterface() {
         }),
       });
 
+      // Rejected before streaming (too long, rate-limited): show the server's reason.
+      if (!response.ok) {
+        const reason = await response
+          .json()
+          .then((b: { error?: string }) => b.error)
+          .catch(() => undefined);
+        throw new Error(reason ?? `Request failed (${response.status})`);
+      }
       if (!response.body) throw new Error("No response body");
 
       const reader = response.body.getReader();
@@ -273,6 +281,7 @@ export default function ChatInterface() {
             onKeyDown={handleKeyDown}
             disabled={loading}
             placeholder=""
+            maxLength={1000}
             rows={1}
             className="flex-1 bg-transparent text-sm resize-none outline-none pb-1 transition-colors duration-200 disabled:opacity-40"
             style={{

@@ -10,15 +10,30 @@ import {
   flushPostHogLogs,
 } from "@/instrumentation";
 import { SeverityNumber } from "@opentelemetry/api-logs";
+import { checkRate, clientIp, validateBody } from "@/lib/guard";
 
 export const runtime = "nodejs";
+// Tool-using answers can take a while; give the function room on Vercel.
+export const maxDuration = 60;
+
+/** Most model/tool steps one question may take, so a looping agent can't run up costs. */
+const MAX_AGENT_STEPS = 12;
+
+const reject = (status: number, error: string) =>
+  Response.json({ error }, { status, headers: { "Cache-Control": "no-store" } });
 
 export async function POST(req: NextRequest) {
-  const { message, history, sessionId } = (await req.json()) as {
-    message: string;
-    history: Array<{ role: "user" | "assistant"; content: string }>;
-    sessionId?: string;
-  };
+  let raw: unknown;
+  try {
+    raw = await req.json();
+  } catch {
+    return reject(400, "Invalid request.");
+  }
+  const checked = validateBody(raw);
+  if (!checked.ok) return reject(400, checked.error);
+  const limited = checkRate(clientIp(req.headers));
+  if (limited) return reject(429, limited);
+  const { message, history, sessionId } = checked.body;
   const posthogSessionId =
     sessionId && /^[A-Za-z0-9_~.@()!':|-]+$/.test(sessionId)
       ? sessionId
@@ -58,6 +73,7 @@ export async function POST(req: NextRequest) {
           { messages },
           {
             version: "v2",
+            recursionLimit: MAX_AGENT_STEPS,
             metadata: {
               posthogSessionId,
               posthogTraceId,
@@ -135,9 +151,15 @@ export async function POST(req: NextRequest) {
           failure_type: error instanceof Error ? error.name : "unknown",
           tool_call_count: toolCallCount,
         });
+        // Full detail goes to the server log; visitors get a plain message, since
+        // provider errors can include account or configuration details.
+        console.error("[chat] response failed:", error);
+        const steps = error instanceof Error && error.name === "GraphRecursionError";
         send({
           type: "error",
-          message: error instanceof Error ? error.message : String(error),
+          message: steps
+            ? "That question needed more steps than the demo allows. Try asking it more simply."
+            : "Something went wrong answering that. Please try again.",
         });
       } finally {
         await flushPostHog();

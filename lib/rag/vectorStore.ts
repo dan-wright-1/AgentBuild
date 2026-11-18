@@ -2,10 +2,15 @@ import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { Document } from "@langchain/core/documents";
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { captureAIEmbedding, type AITraceContext } from "@/lib/posthog-server";
 
-const CACHE_PATH = path.join(process.cwd(), "lib", "rag", "vectorStore.cache.json");
+// On Vercel only the temp folder is writable, so the cache lives there (and is
+// rebuilt on each cold start, which costs a fraction of a cent in embeddings).
+const CACHE_PATH = process.env.VERCEL
+  ? path.join(os.tmpdir(), "vectorStore.cache.json")
+  : path.join(process.cwd(), "lib", "rag", "vectorStore.cache.json");
 
 interface MemoryVector {
   content: string;
@@ -87,8 +92,15 @@ export async function getVectorStore(
     documents: mv.map((v) => ({ pageContent: v.content, metadata: v.metadata })),
     vectors: mv.map((v) => v.embedding),
   };
-  fs.writeFileSync(CACHE_PATH, JSON.stringify(toCache));
-  console.log(`[vectorStore] Built and cached ${documents.length} chunks`);
+  try {
+    fs.writeFileSync(CACHE_PATH, JSON.stringify(toCache));
+    console.log(`[vectorStore] Built and cached ${documents.length} chunks`);
+  } catch (error) {
+    // A failed cache write must not fail the search; the store is already in memory.
+    console.warn(
+      `[vectorStore] Built ${documents.length} chunks; cache not written (${error instanceof Error ? error.message : error})`
+    );
+  }
 
   return vectorStore;
 }

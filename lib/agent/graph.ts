@@ -6,7 +6,10 @@ import { ragTool } from "@/lib/tools/ragTool";
 import { wikipediaTool } from "@/lib/tools/wikipediaTool";
 
 const model = new ChatAnthropic({
-  model: "claude-sonnet-4-6",
+  // Override with ANTHROPIC_MODEL in the deployment to trade quality for cost.
+  model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
+  // Caps the length (and cost) of each model reply.
+  maxTokens: 1024,
 });
 
 export const agent = createReactAgent({

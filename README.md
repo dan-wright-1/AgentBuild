@@ -50,6 +50,29 @@ TypeScript · Next.js 15 App Router · LangGraph · Claude Sonnet 4.6 (Anthropic
 npm test
 ```
 
+## Deploying (Vercel)
+
+The public demo runs on Vercel's free Hobby plan.
+
+1. **Cap spending first.** Every question costs real API credits, so set a monthly limit on each key before going live: Anthropic Console → Settings → Limits; OpenAI → Settings → Limits; Tavily's free plan is already capped at its monthly credit allowance.
+2. Sign in at [vercel.com](https://vercel.com) with GitHub, choose **Add New → Project**, and import `dan-wright-1/AgentBuild`. The defaults (Next.js, `npm run build`) are correct.
+3. Under **Environment Variables**, add `ANTHROPIC_API_KEY`, `TAVILY_API_KEY` and `OPENAI_API_KEY`. PostHog's two `NEXT_PUBLIC_POSTHOG_*` variables are optional.
+4. Deploy. Every push to `main` redeploys.
+
+### Demo guardrails
+
+`lib/guard.ts` rejects oversized questions and conversations, and rate-limits each visitor before any API is called. The agent is capped at 12 model/tool steps per question and 1,024 tokens per reply. The limits are in-memory per server instance, so the provider spending limits above are the real ceiling. Tune them with optional environment variables:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `ANTHROPIC_MODEL` | `claude-sonnet-4-6` | Model the agent uses |
+| `LIMIT_REQUESTS_PER_WINDOW` | `15` | Questions per visitor per window |
+| `LIMIT_WINDOW_MINUTES` | `10` | Length of that window |
+| `LIMIT_REQUESTS_PER_DAY` | `400` | Questions per server instance per day |
+| `LIMIT_MESSAGE_CHARS` | `1000` | Longest question |
+| `LIMIT_HISTORY_MESSAGES` | `20` | Longest conversation, in messages |
+| `LIMIT_HISTORY_CHARS` | `16000` | Longest conversation, in characters |
+
 ## Project Docs
 
 See [`aiDocs/`](./aiDocs/) for PRD, Roadmap, Architecture, and Plan.
