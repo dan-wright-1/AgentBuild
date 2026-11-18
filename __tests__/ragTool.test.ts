@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Document } from "@langchain/core/documents";
 
-// Mock the vector store module
-vi.mock("@/lib/rag/vectorStore", () => ({
-  getVectorStore: vi.fn(),
+// Mock the search index module
+vi.mock("@/lib/rag/searchIndex", () => ({
+  getSearchIndex: vi.fn(),
 }));
 
-import { getVectorStore } from "@/lib/rag/vectorStore";
+import { getSearchIndex } from "@/lib/rag/searchIndex";
 import { ragTool } from "@/lib/tools/ragTool";
 
 const mockStore = {
@@ -15,7 +15,7 @@ const mockStore = {
 
 describe("ragTool", () => {
   beforeEach(() => {
-    vi.mocked(getVectorStore).mockResolvedValue(mockStore as never);
+    vi.mocked(getSearchIndex).mockResolvedValue(mockStore as never);
     mockStore.similaritySearch.mockReset();
   });
 

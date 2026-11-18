@@ -12,7 +12,15 @@ const model = new ChatAnthropic({
   maxTokens: 1024,
 });
 
+// Web search needs a Tavily key. Without one the agent simply doesn't have the
+// tool, rather than reaching for it and failing in front of a visitor.
+const tavilyKey = process.env.TAVILY_API_KEY?.trim();
+const hasWebSearch = Boolean(tavilyKey) && !tavilyKey!.startsWith("your_"); // ignore the .env.example placeholder
+const tools = hasWebSearch
+  ? [calculatorTool, webSearchTool, ragTool, wikipediaTool]
+  : [calculatorTool, ragTool, wikipediaTool];
+
 export const agent = createReactAgent({
   llm: model,
-  tools: [calculatorTool, webSearchTool, ragTool, wikipediaTool],
+  tools,
 });

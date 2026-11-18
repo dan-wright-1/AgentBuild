@@ -5,8 +5,8 @@ A multi-tool AI agent chatbot built with LangChain.js, LangGraph, and Claude. Fe
 ## Tools
 
 - **Calculator** — evaluates mathematical expressions via mathjs
-- **Web Search** — searches the web using the Tavily API
-- **RAG** — semantic search over a local knowledge base with source attribution (documents persist across restarts)
+- **Web Search** — searches the web using the Tavily API (enabled only when `TAVILY_API_KEY` is set)
+- **RAG** — BM25 keyword search over a local knowledge base, with source attribution (no extra API key)
 - **Wikipedia** — fetches summaries directly from Wikipedia
 
 ## Features
@@ -31,11 +31,9 @@ TypeScript · Next.js 15 App Router · LangGraph · Claude Sonnet 4.6 (Anthropic
    ```
    ANTHROPIC_API_KEY=...
    TAVILY_API_KEY=...
-   OPENAI_API_KEY=...
    ```
-   - `ANTHROPIC_API_KEY` — [console.anthropic.com](https://console.anthropic.com)
-   - `TAVILY_API_KEY` — [tavily.com](https://tavily.com)
-   - `OPENAI_API_KEY` — used for RAG embeddings
+   - `ANTHROPIC_API_KEY` (required) — [console.anthropic.com](https://console.anthropic.com)
+   - `TAVILY_API_KEY` (optional) — [tavily.com](https://tavily.com), free plan available. Without it the agent runs with the other three tools.
 
 3. Run the dev server:
    ```bash
@@ -54,9 +52,9 @@ npm test
 
 The public demo runs on Vercel's free Hobby plan.
 
-1. **Cap spending first.** Every question costs real API credits, so set a monthly limit on each key before going live: Anthropic Console → Settings → Limits; OpenAI → Settings → Limits; Tavily's free plan is already capped at its monthly credit allowance.
+1. **Cap spending first.** Every question costs real API credits, so set a monthly limit on the Anthropic key before going live (Anthropic Console → Settings → Limits). Tavily's free plan is already capped at its monthly credit allowance.
 2. Sign in at [vercel.com](https://vercel.com) with GitHub, choose **Add New → Project**, and import `dan-wright-1/AgentBuild`. The defaults (Next.js, `npm run build`) are correct.
-3. Under **Environment Variables**, add `ANTHROPIC_API_KEY`, `TAVILY_API_KEY` and `OPENAI_API_KEY`. PostHog's two `NEXT_PUBLIC_POSTHOG_*` variables are optional.
+3. Under **Environment Variables**, add `ANTHROPIC_API_KEY`. `TAVILY_API_KEY` is optional and turns on web search; add it later and redeploy if you like. PostHog's two `NEXT_PUBLIC_POSTHOG_*` variables are optional.
 4. Deploy. Every push to `main` redeploys.
 
 ### Demo guardrails
